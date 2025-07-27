@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ElectroCart | E-Commerce</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+</head>
+<body>
+
+  <header class="header-container">
+    <!-- Left: Logo -->
+    <div class="left-section">
+      <h1>ElectroCart</h1>
+    </div>
+
+    <!-- Center: Search Bar -->
+    <div class="center-section">
+      <input type="text" placeholder="Search for products..." class="search-bar" />
+    </div>
+
+    <!-- Right: Navigation and User Info -->
+    <div class="right-section">
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#">Cart</a>
+        <a href="#">Orders</a>
+        <a href="login.html" id="login-link">Login</a>
+        <a href="#" id="logout">Logout</a>
+      </nav>
+      <div id="user-info"></div>
+    </div>
+  </header>
+
+  <!-- Category Menu -->
+  <nav class="category-menu">
+    <a href="product.html?category=Clothing">Clothing</a>
+   <a href="product.html?category=Mobiles and Tabs">Mobiles and Tabs</a>
+
+    <a href="product.html?category=Electronics">Electronics</a>
+    <a href="product.html?category=Footwear">Footwear</a>
+    <a href="product.html?category=Watches">Watches</a>
+    <a href="product.html?category=Jewellery">Jewellery</a>
+    <a href="product.html?category=Health and Beauty">Health and Beauty</a>
+    <a href="product.html?category=Furnitures">Furnitures</a>
+  </nav>
+
+  <!-- Banner (only on homepage) -->
+  <div id="banner-container" class="swiper banner-swiper">  
+    <div class="swiper-wrapper">
+      <div class="swiper-slide banner-card"><img src="https://i.ibb.co/PG9WqvK0/banner-watch.png" alt="Banner 1"></div>
+      <div class="swiper-slide banner-card"><img src="https://i.ibb.co/cSq0GvFP/banner-6.png" alt="Banner 2"></div>
+      <div class="swiper-slide banner-card"><img src="https://i.ibb.co/Rk0x82Gf/banner-4-1.png" alt="Banner 3"></div>
+      <div class="swiper-slide banner-card"><img src="https://i.ibb.co/wrCmvDr8/banner-fashion-sale-1.png" alt="Banner 4"></div>
+      <div class="swiper-slide banner-card"><img src="https://i.ibb.co/8gZ987v6/banner-5.png" alt="Banner 5"></div>
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <main>
+    <!-- ✅ Only one product-list container -->
+    <div class="product-grid" id="product-list"></div>
+  </main>
+
+  <footer>
+    <p>&copy;   2025 ElectroCart. All rights reserved.</p>
+  </footer>
+
+  <!-- Swiper Script -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.banner-swiper', {
+      loop: true,
+      autoplay: {
+        delay: 2500,
+        disableOnInteraction: false
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+      },
+      slidesPerView: 1,
+      spaceBetween: 30
+    });
+
+    // Hide banner if not on homepage
+    if (window.location.pathname !== "/index.html" && window.location.pathname !== "/" ) {
+      const banner = document.getElementById("banner-container");
+      if (banner) banner.style.display = "none";
+    }
+  </script>
+
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+      authDomain: "ecommercesite-504d5.firebaseapp.com",
+      projectId: "ecommercesite-504d5",
+      storageBucket: "ecommercesite-504d5.appspot.com",
+      messagingSenderId: "539154564213",
+      appId: "1:539154564213:web:82c160284871ed2cfb643c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginLink = document.getElementById("login-link");
+    const logoutButton = document.getElementById("logout");
+    const userInfoDiv = document.getElementById("user-info");
+
+    // Show/hide user info
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userInfoDiv.textContent = `Hi, ${user.email}`;
+        loginLink.style.display = "none";
+        logoutButton.style.display = "inline";
+      } else {
+        userInfoDiv.textContent = "";
+        loginLink.style.display = "inline";
+        logoutButton.style.display = "none";
+      }
+    });
+
+    // Logout
+    logoutButton.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("Logged out!");
+        location.reload();
+      });
+    });
+
+    // Load homepage products
+    const productList = document.getElementById("product-list");
+
+    async function loadProducts() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        console.log("Products fetched:", querySnapshot.size);
+
+        if (querySnapshot.empty) {
+          productList.innerHTML = "<p>No products found.</p>";
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const product = doc.data();
+          console.log("Product:", product);
+
+          const productCard = document.createElement("div");
+          productCard.classList.add("product-card");
+        productCard.innerHTML = `
+  <a href="product-details.html?id=${doc.id}" style="text-decoration: none; color: inherit;">
+    <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+    <h3>${product.name}</h3>
+    <p>₹${product.price}</p>
+  </a>
+  <button>Add to Cart</button>
+`;
+
+          productList.appendChild(productCard);
+        });
+      } catch (error) {
+        console.error("Error loading products:", error);
+      }
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>

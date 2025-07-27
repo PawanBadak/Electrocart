@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #034080;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .search-bar {
+      width: 300px;
+      padding: 8px;
+      border-radius: 4px;
+      border: none;
+    }
+    .nav-links a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+    #user-info {
+      color: white;
+      margin-left: 20px;
+    }
+    .details-container {
+      display: flex;
+      padding: 30px;
+      gap: 30px;
+      background: white;
+      max-width: 1200px;
+      margin: 30px auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .image-column {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-wrapper {
+      width: 100%;
+      max-width: 400px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #eee;
+    }
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .info-column {
+      flex: 2;
+    }
+    #product-name {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    .price-section {
+      font-size: 20px;
+      margin: 15px 0;
+    }
+    .new-price {
+      color: #b12704;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .old-price {
+      text-decoration: line-through;
+      color: #888;
+      margin-right: 10px;
+    }
+    .discount {
+      color: #388e3c;
+    }
+    .category {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .description {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+    .offers {
+      margin: 20px 0;
+    }
+    .offers ul {
+      padding-left: 20px;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+    }
+    .buttons button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .add-to-cart {
+      background-color: #ffa41c;
+      color: white;
+      font-weight: bold;
+    }
+    .buy-now {
+      background-color: #fb641b;
+      color: white;
+      font-weight: bold;
+    }
+    .quantity-wrapper {
+      margin-top: 20px;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .quantity-control button {
+      width: 32px;
+      height: 32px;
+      font-size: 20px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .quantity-control input {
+      width: 50px;
+      text-align: center;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #total-price {
+      font-size: 18px;
+      color: #222;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ElectroCart</div>
+    <input type="text" class="search-bar" placeholder="Search for products...">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart</a>
+      <a href="orders.html">Orders</a>
+      <a href="#" id="logout">Logout</a>
+      <span id="user-info"></span>
+    </div>
+  </header>
+
+  <main class="details-container">
+    <div class="image-column">
+      <div class="image-wrapper">
+        <img id="product-image" src="" alt="Product Image" />
+      </div>
+    </div>
+    <div class="info-column">
+      <h2 id="product-name">Loading...</h2>
+      <div class="price-section">
+        <span class="new-price" id="product-price"></span>
+        <span class="old-price" id="product-old-price"></span>
+        <span class="discount" id="product-discount"></span>
+      </div>
+      <p class="category" id="product-category"></p>
+      <p class="description" id="product-description"></p>
+
+      <div class="offers">
+        <p><strong>Available Offers:</strong></p>
+        <ul>
+          <li>💳 5% cashback on Axis Bank Credit Card</li>
+          <li>💳 10% off with EMI</li>
+          <li>🏷️ Extra 16% off with coupons</li>
+        </ul>
+      </div>
+
+      <div class="quantity-wrapper">
+        <label for="quantity">Quantity:</label>
+        <div class="quantity-control">
+          <button type="button" onclick="decreaseQty()">−</button>
+          <input type="text" id="quantity" value="1" readonly />
+          <button type="button" onclick="increaseQty()">+</button>
+        </div>
+      </div>
+
+      <p id="total-price">Total: ₹0</p>
+
+      <div class="buttons">
+        <button class="add-to-cart" onclick="addToCart()">🛒 Add to Cart</button>
+        <button class="buy-now">⚡ Buy Now</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+      authDomain: "ecommercesite-504d5.firebaseapp.com",
+      projectId: "ecommercesite-504d5",
+      storageBucket: "ecommercesite-504d5.appspot.com",
+      messagingSenderId: "732904682097",
+      appId: "1:732904682097:web:e41c0c9d4109e5593ae9ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let productPrice = 0;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("user-info").textContent = `Hi, ${user.email}`;
+      } else {
+        document.getElementById("user-info").textContent = "Not logged in";
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", () => {
+      signOut(auth).then(() => window.location.href = "login.html");
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+
+    async function loadProduct() {
+      if (!productId) {
+        alert("No product ID in URL.");
+        return;
+      }
+
+      const docRef = doc(db, "products", productId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        productPrice = parseFloat(data.price);
+        document.getElementById("product-image").src = data.image;
+        document.getElementById("product-name").textContent = data.name;
+        document.getElementById("product-description").textContent = data.description || "No description available.";
+        document.getElementById("product-price").textContent = `₹${data.price}`;
+        document.getElementById("product-old-price").textContent = data.oldPrice ? `₹${data.oldPrice}` : "";
+        document.getElementById("product-discount").textContent = data.discount || "";
+        document.getElementById("product-category").textContent = data.category ? `Category: ${data.category}` : "";
+        updateTotal();
+      } else {
+        alert("Product not found!");
+      }
+    }
+
+    function updateTotal() {
+      const qty = parseInt(document.getElementById("quantity").value);
+      const total = qty * productPrice;
+      document.getElementById("total-price").textContent = `Total: ₹${total}`;
+    }
+
+    window.increaseQty = function() {
+      const qty = document.getElementById("quantity");
+      let value = parseInt(qty.value);
+      if (value < 10) qty.value = value + 1;
+      updateTotal();
+    }
+
+    window.decreaseQty = function() {
+      const qty = document.getElementById("quantity");
+      let value = parseInt(qty.value);
+      if (value > 1) qty.value = value - 1;
+      updateTotal();
+    }
+
+    window.addToCart = function() {
+      const qty = document.getElementById("quantity").value;
+      alert(`Added ${qty} item(s) to cart.`);
+    }
+
+    loadProduct();
+  </script>
+</body>
+</html>

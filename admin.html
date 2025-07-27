@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Manage Products</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f4f4f4; }
+    h1 { text-align: center; }
+    .admin-section { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .product-card { background: #f9f9f9; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, textarea, button { width: 100%; padding: 8px; margin-top: 5px; }
+    button { cursor: pointer; margin-top: 15px; }
+    #product-list .product-card button { width: auto; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Admin Panel</h1>
+  <div class="admin-section">
+    <p id="admin-email"></p>
+
+    <div id="product-form-section">
+      <h3>Add / Edit Product</h3>
+      <input type="hidden" id="product-id">
+      <label>Name</label>
+      <input type="text" id="product-name" placeholder="Enter product name">
+      <label>Price</label>
+      <input type="number" id="product-price" placeholder="Enter price">
+     <label>Category</label>
+
+<select id="product-category">
+  <option value="">-- Select Category --</option>
+  <option value="Clothing">Clothing</option>
+  <option value="Mobiles and Tabs">Mobiles and Tabs</option>
+  <option value="Electronics">Electronics</option>
+  <option value="Footwear">Footwear</option>
+  <option value="Watches">Watches</option>
+  <option value="Jewellry">Jewellry</option>
+  <option value="Health and Beauty">Health and Beauty</option>
+  <option value="Furnitures">Furnitures</option>
+</select>
+
+      <label>Image URL</label>
+      <input type="text" id="product-image" placeholder="Paste image URL">
+      <label>Description</label>
+      <textarea id="product-description" placeholder="Write description..."></textarea>
+      <button onclick="submitProduct()">Save Product</button>
+    </div>
+
+    <hr>
+
+    <h3>Search Product</h3>
+    <input type="text" id="search-box" placeholder="Search by name" oninput="searchProducts()">
+
+    <h3>Product List</h3>
+    <div id="product-list">Loading...</div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+      authDomain: "ecommercesite-504d5.firebaseapp.com",
+      projectId: "ecommercesite-504d5",
+      storageBucket: "ecommercesite-504d5.appspot.com",
+      messagingSenderId: "539154564213",
+      appId: "1:539154564213:web:82c160284871ed2cfb643c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let allProducts = [];
+
+    onAuthStateChanged(auth, async (user) => {
+      const adminEmail = "pawanbadak4@gmail.com"; // 🔁 Replace with your email
+      const emailDisplay = document.getElementById("admin-email");
+
+      if (user && user.email === adminEmail) {
+        emailDisplay.innerText = `Logged in as: ${user.email}`;
+        loadProducts();
+      } else {
+        emailDisplay.innerText = "Access Denied. Admin only.";
+        document.querySelector(".admin-section").innerHTML = "<h3>❌ Access denied. Please login with admin email.</h3>";
+      }
+    });
+
+    async function loadProducts() {
+      const list = document.getElementById("product-list");
+      const snapshot = await getDocs(collection(db, "products"));
+      allProducts = [];
+      list.innerHTML = "";
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        allProducts.push({ id: docSnap.id, ...data });
+
+        list.innerHTML += `
+          <div class="product-card" data-name="${data.name.toLowerCase()}">
+            <strong>${data.name}</strong><br>
+            ₹${data.price}<br>
+            <em>Category: ${data.category || 'N/A'}</em><br>
+            <small>${data.description || ''}</small><br>
+            <button onclick="editProduct('${docSnap.id}')">✏️ Edit</button>
+            <button onclick="deleteProduct('${docSnap.id}')">🗑️ Delete</button>
+          </div>
+        `;
+      });
+    }
+
+    window.submitProduct = async () => {
+      const name = document.getElementById("product-name").value.trim();
+      const price = parseFloat(document.getElementById("product-price").value);
+      const category = document.getElementById("product-category").value.trim();
+      const image = document.getElementById("product-image").value.trim();
+      const description = document.getElementById("product-description").value.trim();
+      const id = document.getElementById("product-id").value;
+
+      if (!name || isNaN(price)) {
+        alert("Please fill name and price correctly.");
+        return;
+      }
+
+      const productData = { name, price, category, image, description };
+
+      try {
+        if (id) {
+          const docRef = doc(db, "products", id);
+          await updateDoc(docRef, productData);
+          alert("✅ Product updated");
+        } else {
+          await addDoc(collection(db, "products"), productData);
+          alert("✅ Product added");
+        }
+
+        clearForm();
+        loadProducts();
+      } catch (e) {
+        console.error("Error:", e.message);
+        alert("❌ Error saving product: " + e.message);
+      }
+    };
+
+    window.editProduct = (id) => {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+
+      document.getElementById("product-id").value = product.id;
+      document.getElementById("product-name").value = product.name;
+      document.getElementById("product-price").value = product.price;
+      document.getElementById("product-category").value = product.category || "";
+      document.getElementById("product-image").value = product.image || "";
+      document.getElementById("product-description").value = product.description || "";
+    };
+
+    window.deleteProduct = async (id) => {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+
+      try {
+        await deleteDoc(doc(db, "products", id));
+        alert("🗑️ Product deleted");
+        loadProducts();
+      } catch (e) {
+        console.error("Delete error:", e.message);
+      }
+    };
+
+    window.searchProducts = () => {
+      const query = document.getElementById("search-box").value.toLowerCase();
+      document.querySelectorAll("#product-list .product-card").forEach(card => {
+        const name = card.getAttribute("data-name");
+        card.style.display = name.includes(query) ? "block" : "none";
+      });
+    };
+
+    function clearForm() {
+      document.getElementById("product-id").value = "";
+      document.getElementById("product-name").value = "";
+      document.getElementById("product-price").value = "";
+      document.getElementById("product-category").value = "";
+      document.getElementById("product-image").value = "";
+      document.getElementById("product-description").value = "";
+    }
+  </script>
+</body>
+</html>
