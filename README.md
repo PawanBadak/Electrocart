@@ -20,7 +20,4 @@ It features:
 
 ---
 
-### 💡 Future Features (coming soon)
-- Add to Cart / Orders
-- Payment gateway
-- Admin dashboard improvements
+
