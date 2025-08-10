@@ -9,7 +9,7 @@ It features:
 - 🔍 Search bar, categories, and more
 
 ### 🔗 Live Website:
-👉 [Click here to view ElectroCart](https://pawanbadak.github.io/Electrocart/)
+👉 [Click here to view ElectroCart][(https://github.com/PawanBadak/Electrocart)]
 
 ---
 
