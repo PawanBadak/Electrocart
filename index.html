@@ -24,7 +24,8 @@
     <div class="right-section">
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="#">Cart</a>
+        <a href="cart.html">Cart</a>
+
         <a href="#">Orders</a>
         <a href="login.html" id="login-link">Login</a>
         <a href="#" id="logout">Logout</a>
@@ -101,7 +102,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
@@ -166,7 +168,13 @@
     <h3>${product.name}</h3>
     <p>₹${product.price}</p>
   </a>
-  <button>Add to Cart</button>
+  <button onclick='addToCart({
+  id: "${doc.id}",
+  name: "${product.name}",
+  price: ${product.price},
+  image: "${product.image}"
+})'>Add to Cart</button>
+
 `;
 
           productList.appendChild(productCard);
@@ -177,6 +185,33 @@
     }
 
     loadProducts();
+     // Make addToCart global
+    window.addToCart = async function(product) {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please log in to add items to your cart.");
+        return;
+      }
+
+      const cartRef = doc(db, "carts", `${user.uid}_${product.id}`);
+
+      try {
+        await setDoc(cartRef, {
+          userId: user.uid,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1
+        });
+        alert("1 item added to cart!");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Something went wrong. Try again.");
+      }
+    };
+
   </script>
+  
 </body>
 </html>

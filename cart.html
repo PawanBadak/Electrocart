@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart - ElectroCart</title>
+  <link rel="stylesheet" href="style.css" />
+ <style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  header {
+  position: sticky; /* OR use fixed */
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #003e7e;
+  padding: 10px 20px;
+  color: white;
+  flex-wrap: wrap;
+}
+
+
+  header h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+
+  .center-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-bar {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    width: 60%;
+    font-size: 16px;
+  }
+
+  .nav-links a {
+    margin-left: 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .right-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  #user-info {
+    font-size: 13px;
+    margin-top: 5px;
+  }
+
+  main.cart-layout {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .cart-summary-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 3;
+    min-width: 0;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    width: 100%;
+  }
+
+  .cart-item img {
+    width: 100px;
+    height: auto;
+    margin-right: 20px;
+    border-radius: 8px;
+  }
+
+  .cart-item h3 {
+    margin: 0;
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+  }
+
+  .quantity-controls button {
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .remove-btn {
+    background: #3687e3;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .right-summary {
+    flex: 1;
+    max-width: 300px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    min-height: 200px; /* 👈 Increased height */
+    position: sticky;
+    top: 120px;
+    margin-left: auto;
+    align-self: flex-start;
+  }
+
+
+.place-order-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #3687e3;
+  color: white;
+  border: none;
+  font-size: 16px;
+  margin-top: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.place-order-btn:hover {
+  background-color: #2d6dc1;
+}
+
+
+  .modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn-confirm {
+  background-color:#df3c3c ;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.btn-cancel {
+  background-color:#4168ea ;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+
+  @media (max-width: 768px) {
+    .cart-summary-wrapper {
+      flex-direction: column;
+    }
+
+    .right-summary {
+      position: static;
+      width: 100%;
+      margin: 0;
+      box-shadow: none;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <header>
+
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <p>Are you sure you want to remove this product?</p>
+    <button id="confirmDelete" class="btn-confirm">Yes, Remove</button>
+    <button id="cancelDelete" class="btn-cancel">Cancel</button>
+  </div>
+</div>
+
+
+
+
+    <div class="left-section">
+      <h1>ElectroCart</h1>
+    </div>
+    <div class="center-section">
+      <input type="text" placeholder="Search for products..." class="search-bar" />
+    </div>
+    <div class="right-section">
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#">Orders</a>
+        <a href="#" id="logout">Logout</a>
+      </nav>
+      <div id="user-info"></div>
+    </div>
+  </header>
+
+  <main class="cart-layout">
+    <h2 style="text-align: center;">Your Cart</h2>
+    
+    <div class="cart-summary-wrapper">
+      <div class="cart-items" id="cart-items-container"></div>
+      <div class="right-summary" id="summary-container"></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+      authDomain: "ecommercesite-504d5.firebaseapp.com",
+      projectId: "ecommercesite-504d5",
+      storageBucket: "ecommercesite-504d5.appspot.com",
+      messagingSenderId: "539154564213",
+      appId: "1:539154564213:web:82c160284871ed2cfb643c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const userInfo = document.getElementById("user-info");
+    const logoutLink = document.getElementById("logout");
+    const cartItemsContainer = document.getElementById("cart-items-container");
+    const summaryContainer = document.getElementById("summary-container");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("You must log in to access the cart.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      userInfo.textContent = ` ${user.email}`;
+
+      try {
+        const q = query(collection(db, "carts"), where("userId", "==", user.uid));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+          return;
+        }
+
+        let total = 0;
+
+        snapshot.docs.forEach((docSnap) => {
+          const item = docSnap.data();
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+
+          const html = `
+            <div class="cart-item" data-id="${docSnap.id}">
+              <img src="${item.image}" alt="${item.name}" />
+              <div>
+                <h3>${item.name}</h3>
+                <p>Price: ₹${item.price}</p>
+                <div class="quantity-controls">
+                  <button class="decrease-btn">−</button>
+                  <span>${item.quantity}</span>
+                  <button class="increase-btn">+</button>
+                </div>
+                <p>Total: ₹${itemTotal}</p>
+                <button class="remove-btn">Remove</button>
+              </div>
+            </div>
+          `;
+
+          cartItemsContainer.innerHTML += html;
+        });
+
+        const platformFee = snapshot.docs.length * 5;
+const discount = 0;
+const totalAmount = total + platformFee - discount;
+
+summaryContainer.innerHTML = `
+<h3 style="margin-bottom: 9px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
+
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Price (${snapshot.docs.length} items)</span>
+    <span>₹${total}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Discount</span>
+    <span style="color: green;">– ₹${discount}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Platform Fee</span>
+    <span>₹${platformFee}</span>
+  </div>
+  <hr style="margin: 16px 0;">
+  <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
+    <span>Total Amount</span>
+    <span>₹${totalAmount}</span>
+  </div>
+<button class="place-order-btn" onclick="goToCheckout()">Place Order</button>
+
+`;
+
+       document.querySelectorAll('.increase-btn, .decrease-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const cartItem = e.target.closest('.cart-item');
+    const id = cartItem.dataset.id;
+    const spanQty = cartItem.querySelector('span');
+    const priceText = cartItem.querySelector('p').textContent;
+    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+
+    let quantity = parseInt(spanQty.textContent);
+    const isInc = e.target.classList.contains('increase-btn');
+    if (isInc) quantity++;
+    else if (quantity > 1) quantity--;
+    else return;
+
+    try {
+      const ref = doc(db, 'carts', id);
+      await updateDoc(ref, { quantity });
+      spanQty.textContent = quantity;
+      cartItem.querySelector('p:last-of-type').textContent = `Total: ₹${price * quantity}`;
+
+      // Recalculate total summary
+      recalculateSummary();
+    } catch (err) {
+      console.error('Error updating quantity:', err);
+      showToast('Failed to update quantity');
+    }
+  });
+});
+
+function recalculateSummary() {
+  let total = 0;
+  const cartItems = document.querySelectorAll('.cart-item');
+  const itemCount = cartItems.length;
+
+  cartItems.forEach(item => {
+    const priceText = item.querySelector('p').textContent;
+    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+    const qty = parseInt(item.querySelector('span').textContent);
+    total += price * qty;
+  });
+
+  const platformFee = itemCount * 5;
+  const discount = 0;
+  const totalAmount = total + platformFee - discount;
+
+  // ✅ Save values for checkout
+  localStorage.setItem("checkoutTotal", totalAmount.toString());
+  localStorage.setItem("checkoutItems", itemCount.toString());
+  localStorage.setItem("checkoutBase", total.toString());
+  localStorage.setItem("platformFee", platformFee.toString());
+
+  summaryContainer.innerHTML = `
+    <h3 style="margin-bottom: 16px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Price (${itemCount} items)</span>
+      <span>₹${total}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Discount</span>
+      <span style="color: green;">- ₹${discount}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Platform Fee</span>
+      <span>₹${platformFee}</span>
+    </div>
+    <hr style="margin: 16px 0;">
+    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
+      <span>Total Amount</span>
+      <span>₹${totalAmount}</span>
+    </div>
+    <button class="place-order-btn" onclick="goToCheckout()">Place Order</button>
+  `;
+}
+
+// ✅ Simple redirect handler
+function goToCheckout() {
+  window.location.href = "checkout.html";
+}
+
+let selectedDeleteId = null;
+
+document.querySelectorAll('.remove-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    selectedDeleteId = e.target.closest('.cart-item').dataset.id;
+    document.getElementById("confirmModal").style.display = "flex";
+  });
+});
+
+document.getElementById("confirmDelete").addEventListener("click", async () => {
+  if (!selectedDeleteId) return;
+  try {
+    await deleteDoc(doc(db, "carts", selectedDeleteId));
+    showToast("Product has been removed ✅");
+    closeConfirmModal();
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    alert("Failed to remove item.");
+    closeConfirmModal();
+  }
+});
+
+document.getElementById("cancelDelete").addEventListener("click", () => {
+  closeConfirmModal();
+  showToast("Cancelled ❌");
+});
+
+function closeConfirmModal() {
+  document.getElementById("confirmModal").style.display = "none";
+  selectedDeleteId = null;
+}
+
+
+      } catch (error) {
+        console.error("Error loading cart:", error);
+        cartItemsContainer.innerHTML = "<p>Failed to load cart items.</p>";
+      }
+    });
+
+    logoutLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      signOut(auth).then(() => {
+        alert("Logged out successfully.");
+        window.location.href = "login.html";
+      });
+    });
+
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.right = "20px";
+  toast.style.padding = "12px 20px";
+  toast.style.backgroundColor = "#28a745";
+  toast.style.color = "#fff";
+  toast.style.borderRadius = "6px";
+  toast.style.fontSize = "14px";
+  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+  toast.style.zIndex = 10000;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 1500);
+  
+}
+
+
+
+  </script>
+  <script>
+  function goToCheckout() {
+    window.location.href = "checkout.html";
+  }
+</script>
+
+</body>
+</html>

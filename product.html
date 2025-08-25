@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>All Products - ElectroCart</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -12,21 +12,19 @@
 </head>
 <body>
   <header class="header-container">
-    <!-- Left: Logo -->
     <div class="left-section">
       <h1>ElectroCart</h1>
     </div>
 
-    <!-- Center: Search Bar -->
     <div class="center-section">
       <input type="text" placeholder="Search for products..." class="search-bar" />
     </div>
 
-    <!-- Right: Navigation and User Info -->
     <div class="right-section">
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="#">Cart</a>
+      <a href="cart.html">Cart</a>
+
         <a href="#">Orders</a>
         <a href="login.html" id="login-link">Login</a>
         <a href="#" id="logout">Logout</a>
@@ -47,10 +45,8 @@
     <a href="product.html?category=Furnitures">Furnitures</a>
   </nav>
 
-  <!-- Category Title -->
   <h2 id="category-title">All Products</h2>
 
-  <!-- Product Grid -->
   <main>
     <div class="product-grid" id="product-list"></div>
   </main>
@@ -66,7 +62,9 @@
       collection,
       getDocs,
       query,
-      where
+      where,
+      doc,
+      setDoc
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     import {
@@ -90,12 +88,13 @@
 
     const productList = document.getElementById("product-list");
     const categoryTitle = document.getElementById("category-title");
-
     const loginLink = document.getElementById("login-link");
     const logoutLink = document.getElementById("logout");
     const userInfoDiv = document.getElementById("user-info");
 
-    // Show/Hide login/logout and email
+    // Expose auth globally for use in non-module function
+    window.auth = auth;
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         loginLink.style.display = "none";
@@ -121,13 +120,12 @@
         });
     });
 
-    // Load products
+    // Load and filter products
     const urlParams = new URLSearchParams(window.location.search);
     const selectedCategory = urlParams.get("category");
 
     async function fetchProducts() {
       let q;
-
       if (selectedCategory) {
         q = query(collection(db, "products"), where("category", "==", selectedCategory));
         categoryTitle.textContent = `${selectedCategory} Products`;
@@ -139,45 +137,59 @@
       const snapshot = await getDocs(q);
       productList.innerHTML = "";
 
-    //   snapshot.forEach((doc) => {
-    //     const data = doc.data();
-    //     const div = document.createElement("div");
-    //     div.classList.add("product-card");
-    //     div.innerHTML = `
-    //       <img src="${data.image}" alt="${data.name}" />
-    //       <h3>${data.name}</h3>
-    //       <p>₹${data.price}</p>
-    //       <small>${data.description}</small>
-    //       <button class="add-to-cart-btn">Add to Cart</button>
-    //     `;
-    //     productList.appendChild(div);
-    //   });
-    // }
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.classList.add("product-card");
 
-    // fetchProducts();
+        const productObj = {
+          id: doc.id,
+          name: data.name,
+          price: data.price,
+          image: data.image
+        };
 
-snapshot.forEach((doc) => {
-  const data = doc.data();
-  const div = document.createElement("div");
-  div.classList.add("product-card");
+        const productJSON = JSON.stringify(productObj).replace(/"/g, '&quot;');
 
-  div.innerHTML = `
-   
-    <a href="product-details.html?id=${doc.id}" style="text-decoration: none; color: inherit;">
-      <img src="${data.image}" alt="${data.name}" />
-      <h3>${data.name}</h3>
-      <p>₹${data.price}</p>
-    </a>
-    <button class="add-to-cart-btn">Add to Cart</button>
-  `;
-  productList.appendChild(div);
-});
-
+        div.innerHTML = `
+          <a href="product-details.html?id=${doc.id}" style="text-decoration: none; color: inherit;">
+            <img src="${data.image}" alt="${data.name}" />
+            <h3>${data.name}</h3>
+            <p>₹${data.price}</p>
+          </a>
+          <button onclick='addToCart(${productJSON})'>Add to Cart</button>
+        `;
+        productList.appendChild(div);
+      });
     }
-fetchProducts();
 
+    fetchProducts();
 
+    // Make addToCart global
+    window.addToCart = async function(product) {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please log in to add items to your cart.");
+        return;
+      }
 
+      const cartRef = doc(db, "carts", `${user.uid}_${product.id}`);
+
+      try {
+        await setDoc(cartRef, {
+          userId: user.uid,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1
+        });
+        alert("1 item added to cart!");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Something went wrong. Try again.");
+      }
+    };
   </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+<!-- ✅ UPDATED login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,7 +72,12 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      setPersistence,
+      browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
@@ -89,11 +95,16 @@
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      signInWithEmailAndPassword(auth, email, password)
+      const params = new URLSearchParams(window.location.search);
+      const returnUrl = params.get("return") || "index.html";
+
+      // ✅ Set persistence before sign-in
+      setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          return signInWithEmailAndPassword(auth, email, password);
+        })
         .then((userCredential) => {
-          // Login success
-          alert("Login successful!");
-          window.location.href = "index.html"; // Redirect to home
+          window.location.href = returnUrl;
         })
         .catch((error) => {
           alert("Login failed: " + error.message);

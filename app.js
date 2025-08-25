@@ -1,6 +1,13 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 // Firebase config
@@ -77,7 +84,13 @@ productCard.innerHTML = `
   <img src="${data.image}" alt="${data.name}" />
   <h3>${data.name}</h3>
   <p>₹${data.price}</p>
-  <button onclick="addToCart('${doc.id}', '${data.name}', ${data.price})" class="add-to-cart-btn">Add to Cart</button>
+<button onclick='addToCart({
+  id: "${doc.id}",
+  name: "${data.name}",
+  price: ${data.price},
+  image: "${data.image}"
+})'>Add to Cart</button>
+
 `;
 
       productGrid.appendChild(productCard);
@@ -88,12 +101,7 @@ productCard.innerHTML = `
 }
 
 // Add to cart (localStorage)
-window.addToCart = function(id, name, price) {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push({ id, name, price });
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`✅ ${name} (₹${price}) added to cart!`);
-};
+
 
 // Load products on page load
 loadProducts();
@@ -112,4 +120,31 @@ function increaseQty() {
     qtyInput.value = current + 1;
   }
 }
+// ✅ Add to Cart Function
+function addToCart(product) {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const cartItemRef = doc(db, "carts", `${user.uid}_${product.id}`);
+      try {
+        await setDoc(cartItemRef, {
+          userId: user.uid,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1
+        });
+        alert("🛒 Product added to cart!");
+      } catch (error) {
+        console.error("Error adding to cart: ", error);
+        alert("❌ Failed to add to cart. Try again.");
+      }
+    } else {
+      alert("🔒 Please login to add items to your cart.");
+      window.location.href = "login.html";
+    }
+  });
+}
 
+// ⬇️ Make it available to inline onclick
+window.addToCart = addToCart;

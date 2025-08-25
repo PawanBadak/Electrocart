@@ -18,18 +18,19 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 350px;
+      width: 380px;
     }
     h2 {
       text-align: center;
       margin-bottom: 20px;
     }
-    input[type="email"], input[type="password"] {
+    input {
       width: 100%;
       padding: 12px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 14px;
     }
     button {
       width: 100%;
@@ -60,8 +61,14 @@
 <body>
   <div class="signup-container">
     <h2>Create Account</h2>
+    <input type="text" id="fullName" placeholder="Full Name" required />
     <input type="email" id="email" placeholder="Email" required />
     <input type="password" id="password" placeholder="Password" required />
+    <input type="text" id="phone" placeholder="Phone Number" required />
+    <input type="text" id="address" placeholder="Address Line" required />
+    <input type="text" id="city" placeholder="City" required />
+    <input type="text" id="state" placeholder="State" required />
+    <input type="text" id="pincode" placeholder="Pincode" required />
     <button onclick="signup()">Sign Up</button>
     <div class="login-link">
       Already have an account? <a href="login.html">Login</a>
@@ -72,6 +79,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
@@ -84,19 +92,38 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    window.signup = function () {
+    window.signup = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const fullName = document.getElementById("fullName").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const pincode = document.getElementById("pincode").value;
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("Signup successful!");
-          window.location.href = "login.html"; // Redirect to login page
-        })
-        .catch((error) => {
-          alert("Signup failed: " + error.message);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Store address in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          email: email,
+          fullName: fullName,
+          phone: phone,
+          address: address,
+          city: city,
+          state: state,
+          pincode: pincode
         });
+
+        alert("Signup successful!");
+        window.location.href = "login.html";
+      } catch (error) {
+        alert("Signup failed: " + error.message);
+      }
     };
   </script>
 </body>

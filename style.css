@@ -377,3 +377,51 @@ nav {
   padding: 4px;
   background-color: #fff;
 }
+
+
+
+
+
+
+
+
+
+
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #007bff;
+  color: white;
+}
+
+.site-title a {
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-links a,
+.auth-links a {
+  margin-right: 1rem;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #f0f0f0;
+}
+
