@@ -324,9 +324,9 @@
           cartItemsContainer.innerHTML += html;
         });
 
-        const platformFee = snapshot.docs.length * 5;
+ 
 const discount = 0;
-const totalAmount = total + platformFee - discount;
+const totalAmount = total - discount;
 
 summaryContainer.innerHTML = `
 <h3 style="margin-bottom: 9px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
@@ -339,10 +339,7 @@ summaryContainer.innerHTML = `
     <span>Discount</span>
     <span style="color: green;">– ₹${discount}</span>
   </div>
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Platform Fee</span>
-    <span>₹${platformFee}</span>
-  </div>
+
   <hr style="margin: 16px 0;">
   <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
     <span>Total Amount</span>
@@ -393,15 +390,22 @@ function recalculateSummary() {
     total += price * qty;
   });
 
-  const platformFee = itemCount * 5;
   const discount = 0;
-  const totalAmount = total + platformFee - discount;
+  const totalAmount = total - discount; // ✅ no platform fee
 
-  // ✅ Save values for checkout
+  // Save values for checkout
   localStorage.setItem("checkoutTotal", totalAmount.toString());
   localStorage.setItem("checkoutItems", itemCount.toString());
   localStorage.setItem("checkoutBase", total.toString());
-  localStorage.setItem("platformFee", platformFee.toString());
+
+  localStorage.setItem("checkoutItemsData", JSON.stringify(
+    Array.from(cartItems).map(item => ({
+      id: item.dataset.id,
+      name: item.querySelector('h3').textContent,
+      price: parseFloat(item.querySelector('p').textContent.replace(/[^\d.]/g, '')),
+      qty: parseInt(item.querySelector('span').textContent)
+    }))
+  ));
 
   summaryContainer.innerHTML = `
     <h3 style="margin-bottom: 16px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
@@ -413,10 +417,6 @@ function recalculateSummary() {
       <span>Discount</span>
       <span style="color: green;">- ₹${discount}</span>
     </div>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-      <span>Platform Fee</span>
-      <span>₹${platformFee}</span>
-    </div>
     <hr style="margin: 16px 0;">
     <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
       <span>Total Amount</span>
@@ -424,7 +424,10 @@ function recalculateSummary() {
     </div>
     <button class="place-order-btn" onclick="goToCheckout()">Place Order</button>
   `;
+
+
 }
+
 
 // ✅ Simple redirect handler
 function goToCheckout() {

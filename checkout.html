@@ -5,370 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checkout - ElectroCart</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #f1f3f6;
-    }
-
-    header {
-      background-color: #052860;
-      color: white;
-      padding: 12px 24px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .container {
-      display: flex;
-      padding: 20px;
-    }
-
-    .left {
-      width: 65%;
-      padding: 10px;
-    }
-
-    .right {
-      width: 35%;
-      padding: 10px;
-    }
-
-    .step {
-      background-color: white;
-      border-radius: 4px;
-      margin-bottom: 15px;
-      padding: 16px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-
-    .step h3 {
-      margin: 0 0 10px 0;
-      color: #333;
-    }
-
-    .step-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .info {
-      color: #555;
-      font-size: 15px;
-    }
-
-    .change-btn {
-      padding: 5px 12px;
-      background-color: #fff;
-      border: 1px solid #2874f0;
-      color: #2874f0;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: 0.2s ease;
-    }
-
-    .change-btn:hover {
-      background-color: #f0f5ff;
-    }
-
-    .price-details, .payment-box {
-      background-color: white;
-      border-radius: 4px;
-      padding: 16px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
-    }
-
-    .price-details h4 {
-      margin-bottom: 10px;
-    }
-
-    .price-details div {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .total-amount {
-      font-weight: bold;
-      border-top: 1px solid #ccc;
-      padding-top: 8px;
-    }
-
-    .payment-options label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .payment-options input {
-      margin-right: 10px;
-    }
-
-    .upi-form {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .upi-form input {
-      flex: 1;
-      padding: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .upi-form button {
-      background-color: #2874f0;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .footer-note {
-      font-size: 13px;
-      color: gray;
-      margin-top: 10px;
-    }
-
-    button.gray {
-      background-color: gray !important;
-    }
-    #continue-btn {
-  padding: 10px 20px;
-  background-color: #ff9f00;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-}
-
-#continue-btn:hover {
-  background-color: #fb8c00;
-}
-.address-form {
-  display: none;
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid #ddd;
-}
-
-.address-form input {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.address-form button {
-  background-color: #2874f0;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
- .right-summary {
-    flex: 1;
-    max-width: 300px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    min-height: 350px; /* 👈 Increased height */
-    position: sticky;
-    top: 120px;
-    margin-left: auto;
-    align-self: flex-start;
-  }
-
-
-.place-order-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #3687e3;
-  color: white;
-  border: none;
-  font-size: 16px;
-  margin-top: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.place-order-btn:hover {
-  background-color: #2d6dc1;
-}
-
-
-.address-form button:hover {
-  background-color: #0b5ed7;
-}
-
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f1f3f6; }
+    header { background-color: #052860; color: white; padding: 12px 24px; font-size: 22px; font-weight: bold; }
+    .container { display: flex; padding: 20px; gap: 20px; flex-wrap: wrap; }
+    .left { flex: 1; min-width: 300px; }
+    .right-summary { flex: 0 0 300px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: sticky; top: 120px; height: fit-content; }
+    .step { background-color: white; border-radius: 4px; margin-bottom: 15px; padding: 16px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .step h3 { margin: 0 0 10px 0; color: #333; }
+    .step-content { display: flex; justify-content: space-between; align-items: center; }
+    .change-btn { padding: 5px 12px; background-color: #fff; border: 1px solid #2874f0; color: #2874f0; cursor: pointer; border-radius: 4px; transition: 0.2s ease; }
+    .change-btn:hover { background-color: #f0f5ff; }
+    .address-form { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; }
+    .address-form input, .address-form select { display: block; width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .address-form button { background-color: #2874f0; color: white; padding: 10px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .address-form button:hover { background-color: #0b5ed7; }
+    #continue-btn, .place-order-btn { padding: 10px 20px; background-color: #ff9f00; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    #continue-btn:hover, .place-order-btn:hover { background-color: #fb8c00; }
+    .payment-box { background-color: white; border-radius: 4px; padding: 16px; box-shadow: 0 0 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+    .payment-options label { display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; }
+    .payment-options input { margin-right: 10px; }
+    .upi-form { margin-top: 10px; display: flex; gap: 10px; }
+    .upi-form input { flex: 1; padding: 6px; border: 1px solid #ccc; }
+    .upi-form button { padding: 8px 16px; border: none; cursor: pointer; }
+    .upi-form button.gray { background-color: gray; color: white; }
   </style>
 </head>
 <body>
 
-  <header>
-    ElectroCart &nbsp;<span style="font-size: 14px;"></span>
-  </header>
+<header>ElectroCart</header>
 
-  <div class="container">
+<div class="container">
 
-    <!-- LEFT SECTION -->
-    <div class="left">
+  <!-- LEFT SECTION -->
+  <div class="left">
 
-      <!-- LOGIN STEP -->
-<div class="step">
-  <h3>1. LOGIN</h3>
-  <div class="step-content">
-    <p>Email: <span id="user-email"><b>Loading...</b></span></p>
-    <div id="change-section" style="display: none; margin-top: 10px;">
-      <p style="margin: 0; color: #444;">Log out & Sign in with another account</p>
-      <button id="continue-btn">Continue Checkout</button>
+    <!-- LOGIN STEP -->
+    <div class="step">
+      <h3>1. LOGIN</h3>
+      <div class="step-content">
+        <p>Email: <span id="user-email"><b>Loading...</b></span></p>
+        <div id="change-section" style="display: none; margin-top: 10px;">
+          <p style="margin: 0; color: #444;">Log out & Sign in with another account</p>
+          <button id="continue-btn">Continue Checkout</button>
+        </div>
+        <button class="change-btn" id="change-btn">CHANGE</button>
+      </div>
     </div>
-    <button class="change-btn" id="change-btn">CHANGE</button>
-  </div>
-</div>
 
+    <!-- DELIVERY ADDRESS STEP -->
+    <div class="step">
+      <h3>2. DELIVERY ADDRESS</h3>
+      <div class="step-content">
+        <p id="delivery-address">Loading...</p>
+        <button class="change-btn" id="change-address-btn">CHANGE</button>
+      </div>
+      <div id="address-form-section" class="address-form">
+        <input type="text" id="address" placeholder="Address" required />
+        <input type="text" id="city" placeholder="City" required />
+        <select id="state" required><option value="">Select State</option></select>
+        <input type="text" id="pincode" placeholder="Pincode" required />
+        <button id="save-address-btn">Save Address</button>
+      </div>
+    </div>
 
-<div class="step">
-  <h3>2. DELIVERY ADDRESS</h3>
-  <div class="step-content">
-    <p id="delivery-address">Loading...</p>
-    <button class="change-btn" id="change-address-btn">CHANGE</button>
-  </div>
-
-  <div id="address-form-section" class="address-form">
-    <input type="text" id="address" placeholder="Address" required />
-    <input type="text" id="city" placeholder="City" required />
-   <select id="state" class="form-control" required>
-  <option value="">Select State</option>
-  <option value="Andhra Pradesh">Andhra Pradesh</option>
-  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-  <option value="Assam">Assam</option>
-  <option value="Bihar">Bihar</option>
-  <option value="Chhattisgarh">Chhattisgarh</option>
-  <option value="Goa">Goa</option>
-  <option value="Gujarat">Gujarat</option>
-  <option value="Haryana">Haryana</option>
-  <option value="Himachal Pradesh">Himachal Pradesh</option>
-  <option value="Jharkhand">Jharkhand</option>
-  <option value="Karnataka">Karnataka</option>
-  <option value="Kerala">Kerala</option>
-  <option value="Madhya Pradesh">Madhya Pradesh</option>
-  <option value="Maharashtra">Maharashtra</option>
-  <option value="Manipur">Manipur</option>
-  <option value="Meghalaya">Meghalaya</option>
-  <option value="Mizoram">Mizoram</option>
-  <option value="Nagaland">Nagaland</option>
-  <option value="Odisha">Odisha</option>
-  <option value="Punjab">Punjab</option>
-  <option value="Rajasthan">Rajasthan</option>
-  <option value="Sikkim">Sikkim</option>
-  <option value="Tamil Nadu">Tamil Nadu</option>
-  <option value="Telangana">Telangana</option>
-  <option value="Tripura">Tripura</option>
-  <option value="Uttar Pradesh">Uttar Pradesh</option>
-  <option value="Uttarakhand">Uttarakhand</option>
-  <option value="West Bengal">West Bengal</option>
-</select>
-
-    <input type="text" id="pincode" placeholder="Pincode" required />
-    <button id="save-address-btn">Save Address</button>
-  </div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px; gap: 20px; flex-wrap: wrap;">
-
-  <!-- LEFT SIDE: Your address/payment etc. -->
-  <div style="flex: 1; min-width: 300px;">
-    <!-- Your existing checkout steps here -->
-    <!-- For example:
-      <div class="step">ADDRESS...</div>
-      <div class="step">PAYMENT...</div>
-    -->
-  </div>
-
-<!-- PRICE SUMMARY (Copied from cart.html) -->
-<div style="position: absolute; top: 90px; right: 10px; width: 400px; background-color: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); padding: 20px;">
-  <h3 style="margin-bottom: 15px; font-weight: 500;">PRICE DETAILS</h3>
-  <hr />
-  <div style="display: flex; justify-content: space-between; margin: 10px 0;">
-    <span>Price (<span id="itemCount">0</span> items)</span>
-    <span>₹<span id="totalAmount">0</span></span>
-  </div>
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Discount</span>
-    <span style="color: green;">– ₹0</span>
-  </div>
- 
-  <hr />
-  <div style="display: flex; justify-content: space-between; font-weight: bold; margin: 10px 0;">
-    <span>Total Amount</span>
-    <span>₹<span id="grandTotal">0</span></span>
-  </div>
-</div>
-
-</div>
-
-      <!-- PAYMENT OPTIONS -->
-      <div class="step">
-        <h3> PAYMENT OPTIONS</h3>
-
-        <div class="payment-box">
-          <div class="payment-options">
-            <label>
-              <input type="radio" name="payment" checked />
-            
-              &nbsp; UPI
-            </label>
-
-            <div class="upi-form">
-              <input type="text" placeholder="Enter UPI ID" />
-              <button>VERIFY</button>
-       <button class="gray" id="pay-now-btn">PAY ₹0</button>
-
-            </div>
-
-            <div class="footer-note">Pay by any UPI app</div>
-
-            <label>
-              <input type="radio" name="payment" />
-              Credit / Debit / ATM Card
-            </label>
-
-
-            <label>
-              <input type="radio" name="payment" />
-              Cash on Delivery
-            </label>
+    <!-- PAYMENT OPTIONS -->
+    <div class="step">
+      <h3>3. PAYMENT OPTIONS</h3>
+      <div class="payment-box">
+        <div class="payment-options">
+          <label><input type="radio" name="payment" checked /> UPI</label>
+          <div class="upi-form">
+            <input type="text" placeholder="Enter UPI ID" />
+            <button id="verify-upi-btn">VERIFY</button>
+            <button class="gray" id="pay-now-btn">PAY ₹0</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT SECTION -->
-  
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  </div>
 
+  <!-- RIGHT SECTION: PRICE SUMMARY -->
+  <div class="right-summary">
+    <h3 style="margin-bottom: 15px; font-weight: 500;">PRICE DETAILS</h3>
+    <hr />
+    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+      <span>Price (<span id="itemCount">0</span> items)</span>
+      <span>₹<span id="totalAmount">0</span></span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Discount</span>
+      <span style="color: green;">– ₹0</span>
+    </div>
+    <hr />
+    <div style="display: flex; justify-content: space-between; font-weight: bold; margin: 10px 0;">
+      <span>Total Amount</span>
+      <span>₹<span id="grandTotal">0</span></span>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-  // your Firebase + Razorpay code here...
-
 
   const firebaseConfig = {
     apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
@@ -383,16 +125,10 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Indian states list
-  const statesList = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
-    "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
-    "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
-    "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
-    "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu and Kashmir"
-  ];
+  const statesList = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Jammu and Kashmir"];
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Elements
     const emailElement = document.getElementById("user-email");
     const addressElement = document.getElementById("delivery-address");
     const changeAddressBtn = document.getElementById("change-address-btn");
@@ -401,29 +137,60 @@
     const changeLoginBtn = document.getElementById("change-btn");
     const changeSection = document.getElementById("change-section");
     const continueBtn = document.getElementById("continue-btn");
+    const stateSelect = document.getElementById("state");
+    const itemCountEl = document.getElementById("itemCount");
+    const totalAmountEl = document.getElementById("totalAmount");
+    const grandTotalEl = document.getElementById("grandTotal");
+    const payBtn = document.getElementById("pay-now-btn");
+    const upiInput = document.querySelector(".upi-form input");
+    const verifyBtn = document.getElementById("verify-upi-btn");
 
     // Populate state dropdown
-    const stateSelect = document.getElementById("state");
-    if (stateSelect && stateSelect.tagName === "SELECT") {
-      statesList.forEach(state => {
-        const option = document.createElement("option");
-        option.value = state;
-        option.textContent = state;
-        stateSelect.appendChild(option);
-      });
+    statesList.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s; opt.textContent = s;
+      stateSelect.appendChild(opt);
+    });
+
+    let currentUser = null;
+    let isValidUPI = false;
+
+    // Function to update summary
+    function updateCheckoutSummary() {
+      const checkoutItemsData = JSON.parse(localStorage.getItem("checkoutItemsData") || "[]");
+      if (!checkoutItemsData.length) {
+        itemCountEl.innerText = 0;
+        totalAmountEl.innerText = 0;
+        grandTotalEl.innerText = 0;
+        payBtn.innerText = `PAY ₹0`;
+        return;
+      }
+      const totalQty = checkoutItemsData.reduce((sum, item) => sum + item.qty, 0);
+      const checkoutTotal = checkoutItemsData.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      itemCountEl.innerText = totalQty;
+      totalAmountEl.innerText = checkoutTotal;
+      grandTotalEl.innerText = checkoutTotal;
+      payBtn.innerText = `PAY ₹${checkoutTotal}`;
     }
 
-    // Handle login state
+    // Initial call
+    updateCheckoutSummary();
+
+    // Listen for localStorage changes (if cart.html updates in another tab)
+    window.addEventListener("storage", (e) => {
+      if (e.key === "checkoutItemsData") updateCheckoutSummary();
+    });
+
+    // Firebase Auth
     onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
       if (user) {
         emailElement.textContent = user.email;
-
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
-          const fullAddress = `${data.address}, ${data.city}, ${data.state} - ${data.pincode}`;
-          addressElement.textContent = fullAddress;
+          addressElement.textContent = `${data.address}, ${data.city}, ${data.state} - ${data.pincode}`;
         } else {
           addressElement.textContent = "No address found.";
         }
@@ -433,129 +200,62 @@
       }
     });
 
-    // Show address form
-    changeAddressBtn.addEventListener("click", () => {
-      addressFormSection.style.display = "block";
-    });
-
-    // Save new address
+    // Address form toggle and save
+    changeAddressBtn.addEventListener("click", () => addressFormSection.style.display = "block");
     saveAddressBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-
+      if (!currentUser) return alert("Login first!");
       const address = document.getElementById("address").value;
       const city = document.getElementById("city").value;
       const state = document.getElementById("state").value;
       const pincode = document.getElementById("pincode").value;
-
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", currentUser.uid);
       try {
         await updateDoc(userRef, { address, city, state, pincode });
-
-        const updatedSnap = await getDoc(userRef);
-        const updatedData = updatedSnap.data();
-        const fullAddress = `${updatedData.address}, ${updatedData.city}, ${updatedData.state} - ${updatedData.pincode}`;
-        addressElement.textContent = fullAddress;
-
+        addressElement.textContent = `${address}, ${city}, ${state} - ${pincode}`;
         addressFormSection.style.display = "none";
-        alert("Address saved successfully ✅");
-      } catch (err) {
-        console.error("Error updating address:", err);
-        alert("⚠️ Error saving address. Please try again.");
-      }
+        alert("Address saved ✅");
+      } catch (err) { console.error(err); alert("Error saving address!"); }
     });
 
-    // Show change login section
-    changeLoginBtn.addEventListener("click", () => {
-      changeSection.style.display = "block";
-    });
+    // Login change
+    changeLoginBtn.addEventListener("click", () => changeSection.style.display = "block");
+    continueBtn.addEventListener("click", () => window.location.href = "signup.html");
 
-    // Continue checkout
-    continueBtn.addEventListener("click", () => {
-      window.location.href = "signup.html";
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const itemCount = localStorage.getItem("checkoutItems") || 0;
-    const totalAmount = localStorage.getItem("checkoutTotal") || 0;
-
-    document.getElementById("itemCount").innerText = itemCount;
-    document.getElementById("totalAmount").innerText = totalAmount;
-    document.getElementById("grandTotal").innerText = totalAmount;
-
-    // Update the PAY ₹ button
-    const payBtn = document.getElementById("pay-now-btn");
-    if (payBtn) {
-      payBtn.innerText = `PAY ₹${totalAmount}`;
-    }
-  });
-
- 
-  document.addEventListener("DOMContentLoaded", () => {
-    const upiInput = document.querySelector(".upi-form input");
-    const verifyBtn = document.querySelector(".upi-form button");
-    const payBtn = document.getElementById("pay-now-btn");
-
-    let isValidUPI = false;
-
+    // UPI validation
     verifyBtn.addEventListener("click", () => {
       const upiID = upiInput.value.trim();
-
-      // Basic validation of UPI format: e.g. name@bank
       const upiRegex = /^[\w.\-_]{2,}@[a-zA-Z]{2,}$/;
-      if (upiRegex.test(upiID)) {
-        isValidUPI = true;
-        payBtn.classList.remove("gray");
-        payBtn.style.backgroundColor = "#ff9f00";
-        alert("✅ UPI ID looks valid!");
-      } else {
-        isValidUPI = false;
-        alert("❌ Invalid UPI ID format. Use something like name@upi");
-      }
+      if (upiRegex.test(upiID)) { isValidUPI = true; payBtn.classList.remove("gray"); alert("UPI ID valid ✅"); }
+      else { isValidUPI = false; alert("Invalid UPI ID ❌"); }
     });
 
+    // Pay button
     payBtn.addEventListener("click", () => {
-      if (!isValidUPI) {
-        alert("⚠️ Please verify a valid UPI ID first.");
-        return;
-      }
-
-      const amount = localStorage.getItem("checkoutTotal") || 0;
-      const upiID = upiInput.value.trim();
-
+      if (!isValidUPI) return alert("Verify a valid UPI ID first!");
+      const checkoutItemsData = JSON.parse(localStorage.getItem("checkoutItemsData") || "[]");
+      const checkoutTotal = checkoutItemsData.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const amount = checkoutTotal * 100;
       const options = {
-  key: "rzp_test_thujzvuOW95wh5", // your test key
-  amount: amount * 100,
-  currency: "INR",
-  name: "ElectroCart",
-  description: "Order Payment",
-  handler: function (response) {
-    alert("✅ Payment successful: " + response.razorpay_payment_id);
-  },
-  prefill: {
-    email: auth.currentUser?.email || "",
-    contact: "" // optional
-  },
-  theme: {
-    color: "#ff9f00"
-  }
-};
-
-
+        key: "rzp_test_thujzvuOW95wh5",
+        amount: amount,
+        currency: "INR",
+        name: "ElectroCart",
+        description: "Order Payment",
+        handler: function(response) {
+          alert("Payment successful ✅\nPayment ID: " + response.razorpay_payment_id);
+          localStorage.removeItem("buyNowProduct");
+          localStorage.removeItem("checkoutItemsData");
+          window.location.href = "thankyou.html";
+        },
+        prefill: { email: currentUser?.email || "", contact: "" },
+        theme: { color: "#ff9f00" }
+      };
       const rzp = new Razorpay(options);
       rzp.open();
     });
+
   });
-
-
-
-
 </script>
-
-</script>
-
-
 
 </body>
 </html>
