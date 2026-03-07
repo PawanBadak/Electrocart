@@ -3,26 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up | ElectroMart</title>
+  <title>Sign Up | ElectroCart</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f0f2f5;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
     }
     .signup-container {
       background: #fff;
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 380px;
+      width: 100%;
+      max-width: 400px;
     }
     h2 {
       text-align: center;
       margin-bottom: 20px;
+      color: #333;
     }
     input {
       width: 100%;
@@ -31,6 +35,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 14px;
+      box-sizing: border-box; /* Ensures padding doesn't break width */
     }
     button {
       width: 100%;
@@ -41,17 +46,25 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 16px;
+      transition: background 0.3s;
     }
     button:hover {
       background: #0056b3;
     }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
     .login-link {
       margin-top: 15px;
       text-align: center;
+      font-size: 14px;
     }
     .login-link a {
       color: #007bff;
       text-decoration: none;
+      font-weight: bold;
     }
     .login-link a:hover {
       text-decoration: underline;
@@ -59,23 +72,23 @@
   </style>
 </head>
 <body>
+
   <div class="signup-container">
     <h2>Create Account</h2>
     <input type="text" id="fullName" placeholder="Full Name" required />
     <input type="email" id="email" placeholder="Email" required />
     <input type="password" id="password" placeholder="Password" required />
     <input type="text" id="phone" placeholder="Phone Number" required />
-    <input type="text" id="address" placeholder="Address Line" required />
+    <input type="text" id="address" placeholder="Area and Street" required />
     <input type="text" id="city" placeholder="City" required />
     <input type="text" id="state" placeholder="State" required />
     <input type="text" id="pincode" placeholder="Pincode" required />
-    <button onclick="signup()">Sign Up</button>
+    <button id="signupBtn" onclick="signup()">Sign Up</button>
     <div class="login-link">
       Already have an account? <a href="login.html">Login</a>
     </div>
   </div>
 
-  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
@@ -95,6 +108,7 @@
     const db = getFirestore(app);
 
     window.signup = async function () {
+      const btn = document.getElementById("signupBtn");
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const fullName = document.getElementById("fullName").value;
@@ -104,11 +118,20 @@
       const state = document.getElementById("state").value;
       const pincode = document.getElementById("pincode").value;
 
+      // Basic validation
+      if(!email || !password || !fullName || !address) {
+          alert("Please fill in all required fields.");
+          return;
+      }
+
       try {
+        btn.disabled = true;
+        btn.innerText = "Creating Account...";
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Store address in Firestore
+        // Store user profile and address in Firestore
         await setDoc(doc(db, "users", user.uid), {
           email: email,
           fullName: fullName,
@@ -116,13 +139,16 @@
           address: address,
           city: city,
           state: state,
-          pincode: pincode
+          pincode: pincode,
+          createdAt: new Date()
         });
 
-        alert("Signup successful!");
+        alert("Signup successful! Please login.");
         window.location.href = "login.html";
       } catch (error) {
         alert("Signup failed: " + error.message);
+        btn.disabled = false;
+        btn.innerText = "Sign Up";
       }
     };
   </script>

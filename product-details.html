@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product Details</title>
   <style>
     /* (✅ Your original styles preserved — unchanged) */
@@ -129,7 +129,7 @@
 
       <div class="buttons">
         <button class="add-to-cart" onclick="addToCart()">🛒 Add to Cart</button>
-        <button class="buy-now">⚡ Buy Now</button>
+       <button class="buy-now" onclick="buyNow()">⚡ Buy Now</button>
       </div>
     </div>
   </main>
@@ -235,6 +235,40 @@
     };
 
     loadProduct();
+    window.buyNow = async function () {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Please login to purchase items.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const quantity = parseInt(document.getElementById("quantity").value);
+    const name = document.getElementById("product-name").textContent;
+    const price = parseFloat(productPrice);
+    const image = document.getElementById("product-image").src;
+
+    // Use the same logic as Add to Cart to save the item first
+    const cartRef = doc(db, "carts", `${user.uid}_${productId}`);
+
+    try {
+        await setDoc(cartRef, {
+            userId: user.uid,
+            productId: productId,
+            name: name,
+            price: price,
+            image: image,
+            quantity: quantity
+        });
+
+        // Skip the alert and go straight to checkout
+        window.location.href = "checkout.html";
+        
+    } catch (err) {
+        console.error("Buy Now Error:", err);
+        alert("Something went wrong. Please try again.");
+    }
+};
   </script>
 </body>
 </html>

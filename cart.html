@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Your Cart - ElectroCart</title>
   <link rel="stylesheet" href="style.css" />
  <style>
@@ -240,7 +241,7 @@
     <div class="right-section">
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="#">Orders</a>
+    <a href="my-orders.html">Orders</a>
         <a href="#" id="logout">Logout</a>
       </nav>
       <div id="user-info"></div>
@@ -256,260 +257,126 @@
     </div>
   </main>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+ <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
-      authDomain: "ecommercesite-504d5.firebaseapp.com",
-      projectId: "ecommercesite-504d5",
-      storageBucket: "ecommercesite-504d5.appspot.com",
-      messagingSenderId: "539154564213",
-      appId: "1:539154564213:web:82c160284871ed2cfb643c"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+  authDomain: "ecommercesite-504d5.firebaseapp.com",
+  projectId: "ecommercesite-504d5",
+  storageBucket: "ecommercesite-504d5.appspot.com",
+  messagingSenderId: "539154564213",
+  appId: "1:539154564213:web:82c160284871ed2cfb643c"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    const userInfo = document.getElementById("user-info");
-    const logoutLink = document.getElementById("logout");
-    const cartItemsContainer = document.getElementById("cart-items-container");
-    const summaryContainer = document.getElementById("summary-container");
+const cartItemsContainer = document.getElementById("cart-items-container");
+const summaryContainer = document.getElementById("summary-container");
+const logoutLink = document.getElementById("logout");
+const userInfo = document.getElementById("user-info");
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("You must log in to access the cart.");
-        window.location.href = "login.html";
-        return;
-      }
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
-      userInfo.textContent = ` ${user.email}`;
+  userInfo.textContent = user.email;
 
-      try {
-        const q = query(collection(db, "carts"), where("userId", "==", user.uid));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
-          return;
-        }
-
-        let total = 0;
-
-        snapshot.docs.forEach((docSnap) => {
-          const item = docSnap.data();
-          const itemTotal = item.price * item.quantity;
-          total += itemTotal;
-
-          const html = `
-            <div class="cart-item" data-id="${docSnap.id}">
-              <img src="${item.image}" alt="${item.name}" />
-              <div>
-                <h3>${item.name}</h3>
-                <p>Price: ₹${item.price}</p>
-                <div class="quantity-controls">
-                  <button class="decrease-btn">−</button>
-                  <span>${item.quantity}</span>
-                  <button class="increase-btn">+</button>
-                </div>
-                <p>Total: ₹${itemTotal}</p>
-                <button class="remove-btn">Remove</button>
-              </div>
-            </div>
-          `;
-
-          cartItemsContainer.innerHTML += html;
-        });
-
- 
-const discount = 0;
-const totalAmount = total - discount;
-
-summaryContainer.innerHTML = `
-<h3 style="margin-bottom: 9px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
-
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Price (${snapshot.docs.length} items)</span>
-    <span>₹${total}</span>
-  </div>
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Discount</span>
-    <span style="color: green;">– ₹${discount}</span>
-  </div>
-
-  <hr style="margin: 16px 0;">
-  <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
-    <span>Total Amount</span>
-    <span>₹${totalAmount}</span>
-  </div>
-<button class="place-order-btn" onclick="goToCheckout()">Place Order</button>
-
-`;
-
-       document.querySelectorAll('.increase-btn, .decrease-btn').forEach(btn => {
-  btn.addEventListener('click', async (e) => {
-    const cartItem = e.target.closest('.cart-item');
-    const id = cartItem.dataset.id;
-    const spanQty = cartItem.querySelector('span');
-    const priceText = cartItem.querySelector('p').textContent;
-    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
-
-    let quantity = parseInt(spanQty.textContent);
-    const isInc = e.target.classList.contains('increase-btn');
-    if (isInc) quantity++;
-    else if (quantity > 1) quantity--;
-    else return;
-
-    try {
-      const ref = doc(db, 'carts', id);
-      await updateDoc(ref, { quantity });
-      spanQty.textContent = quantity;
-      cartItem.querySelector('p:last-of-type').textContent = `Total: ₹${price * quantity}`;
-
-      // Recalculate total summary
-      recalculateSummary();
-    } catch (err) {
-      console.error('Error updating quantity:', err);
-      showToast('Failed to update quantity');
-    }
-  });
-});
-
-function recalculateSummary() {
-  let total = 0;
-  const cartItems = document.querySelectorAll('.cart-item');
-  const itemCount = cartItems.length;
-
-  cartItems.forEach(item => {
-    const priceText = item.querySelector('p').textContent;
-    const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
-    const qty = parseInt(item.querySelector('span').textContent);
-    total += price * qty;
-  });
-
-  const discount = 0;
-  const totalAmount = total - discount; // ✅ no platform fee
-
-  // Save values for checkout
-  localStorage.setItem("checkoutTotal", totalAmount.toString());
-  localStorage.setItem("checkoutItems", itemCount.toString());
-  localStorage.setItem("checkoutBase", total.toString());
-
-  localStorage.setItem("checkoutItemsData", JSON.stringify(
-    Array.from(cartItems).map(item => ({
-      id: item.dataset.id,
-      name: item.querySelector('h3').textContent,
-      price: parseFloat(item.querySelector('p').textContent.replace(/[^\d.]/g, '')),
-      qty: parseInt(item.querySelector('span').textContent)
-    }))
-  ));
-
-  summaryContainer.innerHTML = `
-    <h3 style="margin-bottom: 16px; color: #555; font-weight: bold; font-size:1.1em;">PRICE DETAILS</h3>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-      <span>Price (${itemCount} items)</span>
-      <span>₹${total}</span>
-    </div>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-      <span>Discount</span>
-      <span style="color: green;">- ₹${discount}</span>
-    </div>
-    <hr style="margin: 16px 0;">
-    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em;">
-      <span>Total Amount</span>
-      <span>₹${totalAmount}</span>
-    </div>
-    <button class="place-order-btn" onclick="goToCheckout()">Place Order</button>
-  `;
-
-
-}
-
-
-// ✅ Simple redirect handler
-function goToCheckout() {
-  window.location.href = "checkout.html";
-}
-
-let selectedDeleteId = null;
-
-document.querySelectorAll('.remove-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    selectedDeleteId = e.target.closest('.cart-item').dataset.id;
-    document.getElementById("confirmModal").style.display = "flex";
-  });
-});
-
-document.getElementById("confirmDelete").addEventListener("click", async () => {
-  if (!selectedDeleteId) return;
   try {
-    await deleteDoc(doc(db, "carts", selectedDeleteId));
-    showToast("Product has been removed ✅");
-    closeConfirmModal();
-    setTimeout(() => location.reload(), 1000);
+    const q = query(collection(db, "carts"), where("userId", "==", user.uid));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+      summaryContainer.innerHTML = "";
+      return;
+    }
+
+    cartItemsContainer.innerHTML = "";
+    let total = 0;
+
+    snapshot.forEach((docSnap) => {
+      const item = docSnap.data();
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+
+      cartItemsContainer.innerHTML += `
+        <div class="cart-item" data-id="${docSnap.id}">
+          <img src="${item.image}" />
+          <div>
+            <h3>${item.name}</h3>
+            <p>Price: ₹${item.price}</p>
+            <div class="quantity-controls">
+              <button class="decrease">−</button>
+              <span>${item.quantity}</span>
+              <button class="increase">+</button>
+            </div>
+            <p>Total: ₹${itemTotal}</p>
+            <button class="remove-btn">Remove</button>
+          </div>
+        </div>
+      `;
+    });
+
+    summaryContainer.innerHTML = `
+      <h3>PRICE DETAILS</h3>
+      <div style="display:flex;justify-content:space-between">
+        <span>Price (${snapshot.size} items)</span>
+        <span>₹${total}</span>
+      </div>
+      <hr>
+      <div style="display:flex;justify-content:space-between;font-weight:bold">
+        <span>Total Amount</span>
+        <span>₹${total}</span>
+      </div>
+      <button class="place-order-btn" id="placeOrderBtn">Place Order</button>
+    `;
+
+   document.getElementById("placeOrderBtn").onclick = () => {
+  window.location.href = "checkout.html";
+};
+
+    // Quantity buttons
+    document.querySelectorAll(".increase, .decrease").forEach(btn => {
+      btn.onclick = async () => {
+        const itemDiv = btn.closest(".cart-item");
+        const id = itemDiv.dataset.id;
+        const qtySpan = itemDiv.querySelector("span");
+        let qty = parseInt(qtySpan.textContent);
+
+        if (btn.classList.contains("increase")) qty++;
+        else if (qty > 1) qty--;
+
+        await updateDoc(doc(db, "carts", id), { quantity: qty });
+        location.reload(); // 🔥 Firestore is boss
+      };
+    });
+
+    // Remove item
+    document.querySelectorAll(".remove-btn").forEach(btn => {
+      btn.onclick = async () => {
+        const id = btn.closest(".cart-item").dataset.id;
+        await deleteDoc(doc(db, "carts", id));
+        location.reload();
+      };
+    });
+
   } catch (err) {
-    console.error("Error deleting product:", err);
-    alert("Failed to remove item.");
-    closeConfirmModal();
+    console.error(err);
+    cartItemsContainer.innerHTML = "<p>Failed to load cart items.</p>";
   }
 });
 
-document.getElementById("cancelDelete").addEventListener("click", () => {
-  closeConfirmModal();
-  showToast("Cancelled ❌");
-});
 
-function closeConfirmModal() {
-  document.getElementById("confirmModal").style.display = "none";
-  selectedDeleteId = null;
-}
-
-
-      } catch (error) {
-        console.error("Error loading cart:", error);
-        cartItemsContainer.innerHTML = "<p>Failed to load cart items.</p>";
-      }
-    });
-
-    logoutLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      signOut(auth).then(() => {
-        alert("Logged out successfully.");
-        window.location.href = "login.html";
-      });
-    });
-
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.textContent = message;
-  toast.style.position = "fixed";
-  toast.style.bottom = "20px";
-  toast.style.right = "20px";
-  toast.style.padding = "12px 20px";
-  toast.style.backgroundColor = "#28a745";
-  toast.style.color = "#fff";
-  toast.style.borderRadius = "6px";
-  toast.style.fontSize = "14px";
-  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-  toast.style.zIndex = 10000;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 1500);
-  
-}
-
-
-
-  </script>
-  <script>
-  function goToCheckout() {
-    window.location.href = "checkout.html";
-  }
+logoutLink.onclick = () => {
+  signOut(auth);
+};
 </script>
 
 </body>

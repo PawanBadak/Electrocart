@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - ElectroCart</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f3f6; color: #212121; }
+        header { background: #2874f0; color: white; padding: 15px 5%; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        header a { color: white; text-decoration: none; font-size: 14px; border: 1px solid white; padding: 5px 10px; border-radius: 4px; }
+        
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        h2 { margin-bottom: 20px; }
+
+        .order-card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2874f0; }
+        .order-info b { display: block; font-size: 16px; margin-bottom: 5px; }
+        .order-info span { color: #666; font-size: 13px; }
+        
+        .order-status { text-align: right; }
+        .status-badge { background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .price { display: block; margin-top: 10px; font-weight: bold; font-size: 18px; }
+        
+        .empty-state { text-align: center; padding: 50px; background: white; border-radius: 8px; }
+        .loading { text-align: center; margin-top: 50px; font-weight: bold; color: #2874f0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <span>ElectroCart</span>
+    <a href="index.html">Back to Home</a>
+</header>
+
+<div class="container">
+    <h2>My Orders</h2>
+    <div id="loading" class="loading">Fetching your orders...</div>
+    <div id="ordersList"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey:"AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+        authDomain:"ecommercesite-504d5.firebaseapp.com",
+        projectId:"ecommercesite-504d5",
+        storageBucket:"ecommercesite-504d5.appspot.com",
+        messagingSenderId:"539154564213",
+        appId:"1:539154564213:web:82c160284871ed2cfb643c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const ordersList = document.getElementById("ordersList");
+    const loading = document.getElementById("loading");
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            // Query all orders for the logged-in user, sorted by date
+            const q = query(
+                collection(db, "orders"),
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+            loading.style.display = "none";
+
+            if (querySnapshot.empty) {
+                ordersList.innerHTML = `<div class="empty-state"><h3>No orders found!</h3><p>Start shopping to see your orders here.</p></div>`;
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const order = doc.data();
+                const date = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : "Date N/A";
+                
+                const card = document.createElement("div");
+                card.className = "order-card";
+                card.innerHTML = `
+                    <div class="order-info">
+                        <b>Order ID: #${doc.id.substring(0, 8)}</b>
+                        <span>Placed on: ${date}</span>
+                        <p style="margin: 10px 0 0 0; font-size: 14px; color: #3399cc;">
+                            Items: ${order.items.map(i => i.name || "Product").join(", ")}
+                        </p>
+                    </div>
+                    <div class="order-status">
+                        <span class="status-badge">${order.status || 'Placed'}</span>
+                        <span class="price">₹${order.total}</span>
+                    </div>
+                `;
+                ordersList.appendChild(card);
+            });
+        } catch (error) {
+            console.error("Error loading orders:", error);
+            loading.innerText = "Error loading orders. Check console for index link.";
+        }
+    });
+</script>
+
+</body>
+</html>

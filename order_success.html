@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - ElectroCart</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f3f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .success-card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 90%; }
+        
+        /* Success Animation */
+        .checkmark-circle { width: 80px; height: 80px; position: relative; display: inline-block; vertical-align: top; margin-bottom: 20px; }
+        .checkmark-circle .background { width: 80px; height: 80px; border-radius: 50%; background: #4caf50; position: absolute; }
+        .checkmark-circle .check { width: 45px; height: 25px; position: absolute; border-left: 5px solid white; border-bottom: 5px solid white; transform: rotate(-45deg); top: 22px; left: 18px; }
+        
+        h1 { color: #212121; margin: 10px 0; }
+        p { color: #666; font-size: 16px; margin-bottom: 30px; }
+        
+        .order-details { background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 15px; text-align: left; margin-bottom: 30px; }
+        .detail-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; }
+        .btn { padding: 12px 25px; border-radius: 4px; text-decoration: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: #2874f0; color: white; border: none; }
+        .btn-secondary { background: white; color: #2874f0; border: 1px solid #2874f0; }
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="success-card">
+    <div class="checkmark-circle">
+        <div class="background"></div>
+        <div class="check"></div>
+    </div>
+    
+    <h1>Order Placed Successfully!</h1>
+    <p>Thank you for shopping with ElectroCart. Your electronics are on the way.</p>
+
+    <div class="order-details" id="orderSummary">
+        <div class="detail-row">
+            <span>Status:</span>
+            <b style="color: #4caf50;">Confirmed</b>
+        </div>
+        <div class="detail-row">
+            <span>Payment:</span>
+            <b id="paymentStatus">Processing...</b>
+        </div>
+        <div class="detail-row">
+            <span>Order ID:</span>
+            <span id="orderId">Loading...</span>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a href="index.html" class="btn btn-secondary">Continue Shopping</a>
+        <button onclick="window.print()" class="btn btn-primary">Download Invoice</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey:"AIzaSyDpb1WrouTcU5p1qrm-PyChtVBofp8S6ZI",
+        authDomain:"ecommercesite-504d5.firebaseapp.com",
+        projectId:"ecommercesite-504d5",
+        storageBucket:"ecommercesite-504d5.appspot.com",
+        messagingSenderId:"539154564213",
+        appId:"1:539154564213:web:82c160284871ed2cfb643c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+// Replace the current onAuthStateChanged block with this "Retry" version
+onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+
+    const fetchOrder = async () => {
+        try {
+            const q = query(
+                collection(db, "orders"),
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                // If not found yet, wait 2 seconds and try one more time
+                setTimeout(fetchOrder, 2000); 
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                document.getElementById("orderId").textContent = doc.id;
+                document.getElementById("paymentStatus").textContent = 
+                    data.paymentId === "COD_Pending" ? "Cash on Delivery" : "Paid Online";
+            });
+        } catch (error) {
+            console.error("Error fetching order:", error);
+            // This is where you will see the Link to create the index!
+        }
+    };
+
+    fetchOrder();
+});
+</script>
+
+</body>
+</html>
